@@ -32,8 +32,17 @@ def load_vgg(sess, vgg_path):
     vgg_layer3_out_tensor_name = 'layer3_out:0'
     vgg_layer4_out_tensor_name = 'layer4_out:0'
     vgg_layer7_out_tensor_name = 'layer7_out:0'
+
+
+    tf.saved_model.loader.load(sess,[vgg_tag],vgg_path)
     
-    return None, None, None, None, None
+    return tf.get_default_graph().get_tensor_by_name(vgg_input_tensor_name),\
+           tf.get_default_graph().get_tensor_by_name(vgg_keep_prob_tensor_name),\
+           tf.get_default_graph().get_tensor_by_name(vgg_layer3_out_tensor_name),\
+           tf.get_default_graph().get_tensor_by_name(vgg_layer4_out_tensor_name),\
+           tf.get_default_graph().get_tensor_by_name(vgg_layer7_out_tensor_name)
+
+
 tests.test_load_vgg(load_vgg, tf)
 
 
@@ -48,6 +57,7 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     """
     # TODO: Implement function
     return None
+
 tests.test_layers(layers)
 
 
