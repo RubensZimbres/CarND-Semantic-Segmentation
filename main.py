@@ -5,6 +5,10 @@ import warnings
 from distutils.version import LooseVersion
 import project_tests as tests
 
+log_dir = './TFlog'
+#tf.summary.FileWriter('./TFlog',graph)
+# tensorboard --logdir ./TFlog
+
 
 # Check TensorFlow Version
 assert LooseVersion(tf.__version__) >= LooseVersion('1.0'), 'Please use TensorFlow version 1.0 or newer.  You are using {}'.format(tf.__version__)
@@ -56,6 +60,8 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     :return: The Tensor for the last layer of output
     """
     # TODO: Implement function
+    conv1by1 = tf.layers.conv2d(vgg_layer7_out,4096*2,1,strides=(1,1))
+    #convt1 = tf.layers.conv2d_transpose(conv1by1,512,)
     return None
 
 tests.test_layers(layers)

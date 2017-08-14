@@ -2,6 +2,9 @@ dataset
 dataset/
 data
 data/
+TFlog
+TFlog/*
+TFlog/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
