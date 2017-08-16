@@ -56,14 +56,14 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     :return: The Tensor for the last layer of output
     """
     # TODO: Implement function
-    conv_t1 = tf.layers.conv2d_transpose(vgg_layer7_out,512,(3,3),strides=(2,2),padding='same',name="conv_t1")
+    conv_t1 = tf.layers.conv2d_transpose(vgg_layer7_out,512,(3,3),strides=(2,2),padding='same',activation=tf.nn.relu,name="conv_t1")
     conv_t1_skip = tf.add(conv_t1, vgg_layer4_out, name='skip_layer_4')
-    conv_t2 = tf.layers.conv2d_transpose(conv_t1_skip,256,(3,3),strides=(2,2),padding='same',name="conv_t2")
+    conv_t2 = tf.layers.conv2d_transpose(conv_t1_skip,256,(3,3),strides=(2,2),padding='same',activation=tf.nn.relu,name="conv_t2")
     conv_t2_skip = tf.add(conv_t2, vgg_layer3_out, name='skip_layer_3')
-    conv_t3 = tf.layers.conv2d_transpose(conv_t2_skip,256,(3,3),strides=(2,2),padding='same',name="convt_3")
-    conv_t4 = tf.layers.conv2d_transpose(conv_t3,128,(3,3),strides=(2,2),padding='same',name='convt_4')
-    conv_t5 = tf.layers.conv2d_transpose(conv_t4,64,(3,3),strides=(2,2),padding='same',name='convt_5')
-    conv_last = tf.layers.conv2d(conv_t5,2,(11,11),strides=(1,1),padding='same',name='conv_last')
+    conv_t3 = tf.layers.conv2d_transpose(conv_t2_skip,256,(3,3),strides=(2,2),padding='same',activation=tf.nn.relu,name="conv_t3")
+    conv_t4 = tf.layers.conv2d_transpose(conv_t3,128,(3,3),strides=(2,2),padding='same',activation=tf.nn.relu,name='conv_t4')
+    conv_t5 = tf.layers.conv2d_transpose(conv_t4,64,(3,3),strides=(2,2),padding='same',activation=tf.nn.relu,name='conv_t5')
+    conv_last = tf.layers.conv2d(conv_t5,2,(15,15),strides=(1,1),padding='same',activation=tf.nn.relu,name='conv_last')
     return conv_last
 
 tests.test_layers(layers)
