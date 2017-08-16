@@ -56,15 +56,27 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     :return: The Tensor for the last layer of output
     """
     # TODO: Implement function
-    conv_t1 = tf.layers.conv2d_transpose(vgg_layer7_out,512,(3,3),strides=(2,2),padding='same',activation=tf.nn.relu,name="conv_t1")
-    conv_t1_skip = tf.add(conv_t1, vgg_layer4_out, name='skip_layer_4')
-    conv_t2 = tf.layers.conv2d_transpose(conv_t1_skip,256,(3,3),strides=(2,2),padding='same',activation=tf.nn.relu,name="conv_t2")
-    conv_t2_skip = tf.add(conv_t2, vgg_layer3_out, name='skip_layer_3')
-    conv_t3 = tf.layers.conv2d_transpose(conv_t2_skip,256,(3,3),strides=(2,2),padding='same',activation=tf.nn.relu,name="conv_t3")
-    conv_t4 = tf.layers.conv2d_transpose(conv_t3,128,(3,3),strides=(2,2),padding='same',activation=tf.nn.relu,name='conv_t4')
-    conv_t5 = tf.layers.conv2d_transpose(conv_t4,64,(3,3),strides=(2,2),padding='same',activation=tf.nn.relu,name='conv_t5')
-    conv_last = tf.layers.conv2d(conv_t5,2,(15,15),strides=(1,1),padding='same',activation=tf.nn.relu,name='conv_last')
+    #shape_vgg_l4_out = tf.shape(vgg_layer4_out,name='vgg_l4_out_shape')
+    #shape_vgg_l3_out = tf.shape(vgg_layer3_out, name='vgg_l3_out_shape')
+
+    shape_vgg_l4_out = tf.shape(vgg_layer4_out, name='vgg_l4_out_shape')
+    shape_vgg_l3_out = tf.shape(vgg_layer3_out, name='vgg_l3_out_shape')
+
+    conv_t1 = tf.layers.conv2d_transpose(vgg_layer7_out, 512, (3, 3), strides=(2, 2), padding='same',activation=tf.nn.relu, name="conv_t1")
+    before_skip_1 = tf.slice(conv_t1, [0, 0, 0, 0], shape_vgg_l4_out, name='crop_1')
+    conv_t1_skip = tf.add(before_skip_1, vgg_layer4_out, name='skip_layer_4')
+    conv_t2 = tf.layers.conv2d_transpose(conv_t1_skip, 256, (3, 3), strides=(2, 2), padding='same',activation=tf.nn.relu, name="conv_t2")
+
+    before_skip_2 = tf.slice(conv_t2, [0, 0, 0, 0], shape_vgg_l3_out, name='crop_2')
+    conv_t2_skip = tf.add(before_skip_2, vgg_layer3_out, name='skip_layer_3')
+    conv_t3 = tf.layers.conv2d_transpose(conv_t2_skip, 256, (3, 3), strides=(2, 2), padding='same',activation=tf.nn.relu, name="conv_t3")
+    conv_t4 = tf.layers.conv2d_transpose(conv_t3, 128, (3, 3), strides=(2, 2), padding='same',activation=tf.nn.relu, name='conv_t4')
+    conv_t5 = tf.layers.conv2d_transpose(conv_t4, 64, (3, 3), strides=(2, 2), padding='same', activation=tf.nn.relu, name='conv_t5')
+    conv_last = tf.layers.conv2d(conv_t5, 2, (15, 15), strides=(1, 1), padding='same', activation=tf.nn.relu, name='conv_last')
     return conv_last
+
+    # shape_input = tf.shape(input_image, name='input_shape')
+    # final_crop = tf.slice(conv_last, [0, 0, 0, 0], [shape_input[0], shape_input[1], shape_input[2], 2], name='final_crop')
 
 tests.test_layers(layers)
 
