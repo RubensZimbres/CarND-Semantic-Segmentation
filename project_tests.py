@@ -83,10 +83,11 @@ def test_load_vgg(load_vgg, tf_module):
 @test_safe
 def test_layers(layers):
     num_classes = 2
+    input_image = tf.placeholder(tf.float32, [None, None, None, 3])
     vgg_layer3_out = tf.placeholder(tf.float32, [None, None, None, 256])
     vgg_layer4_out = tf.placeholder(tf.float32, [None, None, None, 512])
     vgg_layer7_out = tf.placeholder(tf.float32, [None, None, None, 4096])
-    layers_output = layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes)
+    layers_output = layers(input_image,vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes)
 
     _assert_tensor_shape(layers_output, [None, None, None, num_classes], 'Layers Output')
 
