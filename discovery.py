@@ -20,7 +20,7 @@ learning_rate = 0.01
 correct_label = tf.placeholder(tf.float32, [None, None, None, num_classes])
 #inp =np.random.randn(1, 1024, 256, 3)
 #print(inp.shape)
-a = True
+a = False
 if(a):
     with tf.Session() as sess:
         ############### load the model
@@ -113,14 +113,17 @@ if(a):
         tf.summary.FileWriter('./TFlog', graph)
 
 if not a:
-    n=6
-    inp = np.array(range(n*n),dtype=np.float64)
-    inp = inp.reshape((1,n,n,1))
-    print (inp.reshape(n,n))
-    inPlace = tf.placeholder(tf.float64,shape=[None,None,None,1],name='in')
-    out = tf.layers.max_pooling2d(inPlace,2,2,padding='same',name='pool1')
+    n=3
+    inp = np.array(range(n*n*2),dtype=np.float64)
+    inp = inp.reshape((1,n,n,2))
+    #print (inp.reshape(n,n,2))
+    print(inp)
+    inPlace = tf.placeholder(tf.float64,shape=[None,None,None,2],name='in')
+    #out = tf.layers.max_pooling2d(inPlace,2,2,padding='same',name='pool1')
+    out = tf.argmax(inPlace, axis = 3)
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
-        res = sess.run(out,feed_dict={inPlace:inp})
+        res, inP = sess.run([out,inPlace],feed_dict={inPlace:inp})
         print(res.shape)
         print(res)
+        #print(inP[0,0,0,0])
