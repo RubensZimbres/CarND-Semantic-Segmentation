@@ -184,7 +184,7 @@ def run(command):
     runs_dir = './runs'
     #TF_log_dir = './TFlog'
     batch_size = 5
-    num_epochs = 100
+    num_epochs = 30
     learning_rate = 0.0005
     tests.test_for_kitti_dataset(data_dir)
 
@@ -223,14 +223,19 @@ def run(command):
             print('model saved!')
         if (command == 1):
             helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
-        if (command == 2):
+        if (command == 2): # only inference (load the model saved in previous executions)
             saver = tf.train.Saver()
             saver.restore(sess, './model/model.ckpt')
             helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
+        if(command == 3): # generate the pb file
+            saver = tf.train.Saver()
+            saver.restore(sess, './model/model.ckpt')
+            out = tf.argmax(tf.nn.softmax(layers_output),axis=-1 , name='labeled_output')
+            tf.train.write_graph(sess.graph.as_graph_def(), './model', 'saved_Graph.pb',as_text=False)
 
         # OPTIONAL: Apply the trained model to a video
 
 
 
 if __name__ == '__main__':
-    run(1)
+    run(3)

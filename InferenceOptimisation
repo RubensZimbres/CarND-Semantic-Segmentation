@@ -1,0 +1,35 @@
+cd /media/yousof/Volume/GeneralToolkits/tensorflow/
+bazel build --config=opt --config=cuda //tensorflow/tools/pip_package:build_pip_package tensorflow/python/tools:freeze_graph tensorflow/python/tools:optimize_for_inference tensorflow/tools/graph_transforms/transform_graph
+
+cd /media/yousof/Volume/SDC/Gits/CarND-Semantic-Segmentation/model
+/media/yousof/Volume/GeneralToolkits/tensorflow/bazel-bin/tensorflow/python/tools/freeze_graph \
+--input_graph=saved_Graph.pb \
+--input_checkpoint=model.ckpt \
+--input_binary=true \
+--output_graph=frozen_graph.pb \
+--output_node_names=labeled_output
+
+/media/yousof/Volume/GeneralToolkits/tensorflow/bazel-bin/tensorflow/python/tools/optimize_for_inference \
+--input=frozen_graph.pb \
+--output=optimized_graph.pb \
+--frozen_graph=True \
+--input_names=image_input \
+--output_names=labeled_output
+
+/media/yousof/Volume/GeneralToolkits/tensorflow/bazel-bin/tensorflow/tools/graph_transforms/transform_graph \
+--in_graph=frozen_graph.pb \
+--out_graph=eightbit_graph.pb \
+--inputs=image_input \
+--outputs=labeled_output \
+--transforms='
+add_default_attributes
+remove_nodes(op=Identity, op=CheckNumerics)
+fold_constants(ignore_errors=true)
+fold_batch_norms
+fold_old_batch_norms
+fuse_resize_and_conv
+quantize_weights
+quantize_nodes
+strip_unused_nodes
+sort_by_execution_order'
+
