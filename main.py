@@ -61,33 +61,39 @@ def layers(input_image,vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_class
         ##
         conv_1x1 = tf.layers.conv2d(vgg_layer7_out,4096,(1,1),strides=(1,1),padding='same', activation=tf.nn.relu, name="conv_1x1")
         conv_t1 = tf.layers.conv2d_transpose(conv_1x1, 512, (3, 3), strides=(2, 2), padding='same',
-                                             activation=tf.nn.relu, name="conv_t1")
-        conv_t1_1 = tf.layers.conv2d(conv_t1,512,(3,3), padding='same',activation=tf.nn.relu,name="conv_t1_1")
+                                             #activation=tf.nn.relu,
+                                             name="conv_t1")
+        conv_t1_1 = tf.layers.conv2d(conv_t1,512,(5,5), padding='same',activation=tf.nn.relu,name="conv_t1_1")
         before_skip_1 = tf.slice(conv_t1_1, [0, 0, 0, 0], shape_vgg_l4_out, name='crop_1')
         conv_t1_skip = tf.add(before_skip_1, vgg_layer4_out, name='skip_layer_4')
         conv_t2 = tf.layers.conv2d_transpose(conv_t1_skip, 256, (3, 3), strides=(2, 2), padding='same',
-                                             activation=tf.nn.relu, name="conv_t2")
-        conv_t2_1 = tf.layers.conv2d(conv_t2, 256, (3, 3), padding='same',activation=tf.nn.tanh, name="conv_t2_1")
+                                             #activation=tf.nn.relu,
+                                             name="conv_t2")
+        conv_t2_1 = tf.layers.conv2d(conv_t2, 256, (5, 5), padding='same',activation=tf.nn.tanh, name="conv_t2_1")
         before_skip_2 = tf.slice(conv_t2_1, [0, 0, 0, 0], shape_vgg_l3_out, name='crop_2')
         conv_t2_skip = tf.add(before_skip_2, vgg_layer3_out, name='skip_layer_3')
         conv_t3 = tf.layers.conv2d_transpose(conv_t2_skip, 256, (3, 3), strides=(2, 2), padding='same',
-                                             activation=tf.nn.tanh, name="conv_t3")
-        conv_t3_1 = tf.layers.conv2d(conv_t3, 256, (3, 3), padding='same', activation=tf.nn.relu,name='conv_t3_1')
+                                             #activation=tf.nn.tanh,
+                                             name="conv_t3")
+        conv_t3_1 = tf.layers.conv2d(conv_t3, 256, (5, 5), padding='same', activation=tf.nn.relu,name='conv_t3_1')
         conv_t4 = tf.layers.conv2d_transpose(conv_t3_1, 128, (3, 3), strides=(2, 2), padding='same',
-                                             activation=tf.nn.relu, name='conv_t4')
-        conv_t4_1 = tf.layers.conv2d(conv_t4, 128, (3, 3), padding='same', activation=tf.nn.tanh,name='conv_t4_1')
-        conv_t5 = tf.layers.conv2d_transpose(conv_t4_1, 64, (3, 3), strides=(2, 2), padding='same', activation=tf.nn.relu,
+                                             #activation=tf.nn.relu,
+                                             name='conv_t4')
+        conv_t4_1 = tf.layers.conv2d(conv_t4, 128, (5, 5), padding='same', activation=tf.nn.tanh,name='conv_t4_1')
+        conv_t5 = tf.layers.conv2d_transpose(conv_t4_1, 64, (3, 3), strides=(2, 2), padding='same', #activation=tf.nn.relu,
                                              name='conv_t5')
         conv_t5_1 = tf.layers.conv2d(conv_t5, 64, (3, 3), padding='same', activation=tf.nn.relu,name='conv_t5_1')
-        conv_last = tf.layers.conv2d(conv_t5_1, num_classes, (15, 15), strides=(1, 1), padding='same',
-                                     activation=tf.nn.relu,
+        conv_last = tf.layers.conv2d(conv_t5_1, num_classes, (3, 3), strides=(1, 1), padding='same',
+                                     #activation=tf.nn.tanh,
                                      name='conv_last')
         final_crop = tf.slice(conv_last, [0, 0, 0, 0], [shape_input[0], shape_input[1], shape_input[2], num_classes],
                               name='final_crop')
         #final_crop_shape = tf.shape(final_crop , name='final_crop_shape')
-        tf.summary.image('final_crop_Image' ,tf.expand_dims(final_crop[:,:,:,0],axis=3),
-                         #tf.cast(final_crop[:,:,:,0],tf.uint8),
+        tf.summary.image('final_crop_Image_0' ,tf.expand_dims(final_crop[:,:,:,0],axis=3),
                          max_outputs= 1000)
+        tf.summary.image('final_crop_Image_1', tf.expand_dims(final_crop[:, :, :, 1], axis=3),
+                         max_outputs=1000)
+        tf.summary.image('VGG_out_1', vgg_layer7_out[:, :, :, 0:3],max_outputs=1000)
     return final_crop
 
 #tests.test_layers(layers)
@@ -112,7 +118,7 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
         tf.summary.scalar('cross entropy loss',cross_entropy_loss)
         IoU,IoUop = tf.metrics.mean_iou(tf.argmax(labels, axis = 1), tf.argmax(logits, axis = 1),num_classes,name='IoUmean')
         tf.summary.scalar('IoUmean', IoU)
-        total_loss = cross_entropy_loss + 10.0*(1.0 - IoU)
+        total_loss = cross_entropy_loss + (1.0 - IoU)
         tf.summary.scalar('total loss', total_loss)
         optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
         training_operation = optimizer.minimize(total_loss,var_list=updatable_variables) # ,var_list=updatable_variables
@@ -136,7 +142,7 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
     :param keep_prob: TF Placeholder for dropout keep probability
     :param learning_rate: TF Placeholder for learning rate
     """
-    correct_image = correct_label[:, :, :, 0]
+    correct_image = correct_label[:, :, :, 1]
     correct_image = tf.expand_dims(correct_image, axis=3)
     tf.summary.image('correct_Image', correct_image, max_outputs=1000)
 
@@ -171,15 +177,15 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
 #tests.test_train_nn(train_nn)
 
 
-def run():
+def run(command):
     num_classes = 2
     image_shape = (160, 576) # (160, 576)
     data_dir = './data'
     runs_dir = './runs'
     #TF_log_dir = './TFlog'
-    batch_size = 10
-    num_epochs = 50
-    learning_rate = 0.001
+    batch_size = 5
+    num_epochs = 100
+    learning_rate = 0.0005
     tests.test_for_kitti_dataset(data_dir)
 
     # Download pretrained vgg model
@@ -208,15 +214,23 @@ def run():
         layers_output = layers(input_image,vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes)
         logits, train_op, cross_entropy_loss , IoUop= optimize(layers_output, correct_label, learning_rate, num_classes)
         # TODO: Train NN using the train_nn function
-        train_nn(sess, num_epochs, batch_size, get_batches_fn, train_op, cross_entropy_loss, input_image,
-                 correct_label, keep_prob, learning_rate, IoUop)
-        # TODO: Save inference data using helper.save_inference_samples
-        saver = tf.train.Saver()
-        saver.save(sess, './model/model.ckpt')
-        print('model saved!')
-        helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
+        if (command == 0 or command==1):
+            train_nn(sess, num_epochs, batch_size, get_batches_fn, train_op, cross_entropy_loss, input_image,
+                     correct_label, keep_prob, learning_rate, IoUop)
+            # TODO: Save inference data using helper.save_inference_samples
+            saver = tf.train.Saver()
+            saver.save(sess, './model/model.ckpt')
+            print('model saved!')
+        if (command == 1):
+            helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
+        if (command == 2):
+            saver = tf.train.Saver()
+            saver.restore(sess, './model/model.ckpt')
+            helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
+
         # OPTIONAL: Apply the trained model to a video
 
 
+
 if __name__ == '__main__':
-    run()
+    run(1)

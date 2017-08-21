@@ -6,6 +6,12 @@ TFlog
 TFlog/*
 TFlog/
 model/*
+TFLogArchive/
+TFLogArchive/*
+TFLogArchive
+run
+run/
+run/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
