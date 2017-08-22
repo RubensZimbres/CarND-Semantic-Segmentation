@@ -9,9 +9,9 @@ model/*
 TFLogArchive/
 TFLogArchive/*
 TFLogArchive
-run
-run/
-run/*
+run*
+run*/
+run*/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
