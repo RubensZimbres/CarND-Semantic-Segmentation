@@ -5,8 +5,6 @@ In this project, you'll label the pixels of a road in images using a Fully Convo
 [//]: # (Image References)
 [image1]: ./cover.jpg "Segmentation"
 
-![alt text][image1]
-
 ### Setup
 ##### Frameworks and Packages
 Make sure you have the following is installed:
@@ -26,3 +24,10 @@ Download the [Kitti Road dataset](http://www.cvlibs.net/datasets/kitti/eval_road
 ### My Learnings
 * I had a difficult time before get everything working. The main was the model was not getting trained. The main problem was I was choosing ig learning rate. That was causing the network stop training at first early stages.
 * In order to have a network, compatible to different shapes, I used `tf.slice` and `tf.shape` operations.
+* I trained the network first with 100 Epochs but from the output of the tensorboard I found that 30 Epochs is enough. More the that, the totla loss starts to increase sometimes and only the mean of IoU was getting better.
+
+### Output example
+The output of the main network can be founded [here](https://github.com/yosoufe/CarND-Semantic-Segmentation/tree/master/runs/30Epochs)
+
+As an example:
+![alt text][image1]
