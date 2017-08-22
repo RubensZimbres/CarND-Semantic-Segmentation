@@ -18,7 +18,7 @@ Download the [Kitti Road dataset](http://www.cvlibs.net/datasets/kitti/eval_road
 ### Write Up
 * The main implementation is in the `main.py`.
 * You can find the files regarding the saved model, and optimised model [here](https://drive.google.com/drive/folders/0Bxx8osZ5EmIiNFY1cTZZQVRmSDg?usp=sharing). If you want to reuse it, download them in a folder called `model` in git folder.
-* I generated as well the 8bit version of the network. The file is called `eightbit_graph.pb` shared in goolge drive folder. You can run the `OnlyInference.py` to use this 8bit graph and the result of this model is saved in [here](https://github.com/yosoufe/CarND-Semantic-Segmentation/tree/master/run2). Some of the images are done poorly using the 8bit model but a lot of them are almost the same. The `.pb` file is hugely smaller.
+* I generated as well the 8bit version of the network. The file is called `eightbit_graph.pb` shared in google drive folder. You can run the `OnlyInference.py` to use this 8bit graph and the result of this model is saved in [here](https://github.com/yosoufe/CarND-Semantic-Segmentation/tree/master/run2). Some of the images are done poorly using the 8bit model but a lot of them are almost the same. The `.pb` file is hugely smaller.
 * I have tried to optimise using the tensorflow optimiser. The output was not that much different from the input in terms of size.
 
 ### My Learnings
